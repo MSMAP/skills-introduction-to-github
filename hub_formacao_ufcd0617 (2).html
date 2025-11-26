@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hub de Gestão - UFCD 0617</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-box .number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-box .label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #667eea;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sessions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .session-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .session-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .session-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .session-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .session-info h3 {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 5px;
+        }
+
+        .session-info .duration {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .session-details {
+            margin-bottom: 20px;
+        }
+
+        .session-details p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .topics {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .topics h4 {
+            color: #667eea;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+
+        .topics ul {
+            list-style: none;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .topics li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .topics li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .resources {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .resource-badge {
+            padding: 8px 15px;
+            background: #e8eaf6;
+            color: #667eea;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .resource-badge.ppt {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .resource-badge.quiz {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .resource-badge.ficha {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .materials-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .material-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .material-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+        }
+
+        .material-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .material-info {
+            flex: 1;
+        }
+
+        .material-info h4 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .material-info p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .checklist {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .checklist h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+
+        .checklist-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            background: #e8eaf6;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .checklist-item.checked {
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
+        .progress-bar {
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .tips-box {
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe5b4 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #ffc107;
+            margin-bottom: 25px;
+        }
+
+        .tips-box h4 {
+            color: #f57c00;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .tips-box ul {
+            list-style: none;
+        }
+
+        .tips-box li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .tips-box li:before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+        }
+
+        .calendar-view {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .calendar-header h3 {
+            color: #667eea;
+            font-size: 1.4em;
+        }
+
+        .date-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .date-input-group input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .date-input-group button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .calendar-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .calendar-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 5px solid #667eea;
+        }
+
+        .calendar-date {
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .calendar-date .day {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .calendar-date .month {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .calendar-info {
+            flex: 1;
+        }
+
+        .calendar-info h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .calendar-info p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .formandos-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .formando-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .formando-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .formando-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .formando-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        .formando-notes {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .add-formando-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .add-formando-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .delete-btn {
+            padding: 8px 15px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .progress-indicator {
+            display: flex;
+            gap: 5px;
+            margin-top: 15px;
+        }
+
+        .progress-dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .progress-dot.completed {
+            background: #4caf50;
+            color: white;
+        }
+
+        .progress-dot:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .sessions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .date-input-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .date-input-group input,
+            .date-input-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Hub de Gestão - UFCD 0617</h1>
+            <p>Gestão de Recursos Informáticos | 25 horas</p>
+            
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="number">10</div>
+                    <div class="label">Sessões</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">25h</div>
+                    <div class="label">Duração Total</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">7</div>
+                    <div class="label">PowerPoints</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">4</div>
+                    <div class="label">Quizzes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="number">6</div>
+                    <div class="label">Fichas</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('sessoes')">📅 Sessões</button>
+            <button class="tab" onclick="showTab('materiais')">📁 Materiais</button>
+            <button class="tab" onclick="showTab('calendario')">📆 Calendário</button>
+            <button class="tab" onclick="showTab('checklist')">✅ Checklist</button>
+            <button class="tab" onclick="showTab('formandos')">👥 Formandos</button>
+            <button class="tab" onclick="showTab('dicas')">💡 Dicas Pedagógicas</button>
+        </div>
+
+        <!-- TAB: SESSÕES -->
+        <div id="sessoes" class="tab-content active">
+            <div class="sessions-grid">
+                <!-- Sessão 1 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">1</div>
+                        <div class="session-info">
+                            <h3>Recursos Informáticos</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Introdutória</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>O que são recursos informáticos</li>
+                                <li>Os 4 tipos principais</li>
+                                <li>Hardware, Software, Pessoas, Dados</li>
+                                <li>Vantagens na empresa</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge ppt">PowerPoint</span>
+                        <span class="resource-badge quiz">Quiz 1</span>
+                        <span class="resource-badge quiz">Quiz 2</span>
+                        <span class="resource-badge ficha">Ficha Trabalho</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 2 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">2</div>
+                        <div class="session-info">
+                            <h3>Globalização</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Teórica + Prática</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>Antes vs Agora</li>
+                                <li>Sociedade de Informação</li>
+                                <li>Mudanças na comunicação</li>
+                                <li>Impacto da tecnologia</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge ppt">PowerPoint</span>
+                        <span class="resource-badge quiz">Quiz V/F</span>
+                        <span class="resource-badge ficha">Ficha Trabalho</span>
+                        <span class="resource-badge">Atividades</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 3 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">3</div>
+                        <div class="session-info">
+                            <h3>Classificação Detalhada</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Mista</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>Hardware: Input, Output, Armazenamento</li>
+                                <li>Software: Sistema vs Aplicação</li>
+                                <li>Pessoas: Funções e responsabilidades</li>
+                                <li>Como trabalham juntos</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge ppt">PowerPoint</span>
+                        <span class="resource-badge quiz">Quiz Revisão</span>
+                        <span class="resource-badge ficha">Ficha Trabalho</span>
+                        <span class="resource-badge">Jogo Categorias</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 4 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">4</div>
+                        <div class="session-info">
+                            <h3>Planeamento de Recursos</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Prática</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>Importância do planeamento</li>
+                                <li>5 Etapas do planeamento</li>
+                                <li>Caso de estudo prático</li>
+                                <li>Criar orçamentos</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge ppt">PowerPoint</span>
+                        <span class="resource-badge">Template Excel</span>
+                        <span class="resource-badge">Caso Estudo</span>
+                        <span class="resource-badge">Forms Quiz</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 5 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">5</div>
+                        <div class="session-info">
+                            <h3>Centro Informático</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Teórica + Prática</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>O que é um centro informático</li>
+                                <li>Organograma e estrutura</li>
+                                <li>Funções da equipa TI</li>
+                                <li>Boas práticas</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge ppt">PowerPoint</span>
+                        <span class="resource-badge">Jogo "Quem faz o quê?"</span>
+                        <span class="resource-badge">Criar Organograma</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 6 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">6</div>
+                        <div class="session-info">
+                            <h3>Manutenção de Sistemas</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Mista</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>Ciclo de vida de sistemas</li>
+                                <li>4 Tipos de manutenção</li>
+                                <li>Importância da manutenção</li>
+                                <li>Criar plano de manutenção</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge ppt">PowerPoint</span>
+                        <span class="resource-badge">Jogo Cenários</span>
+                        <span class="resource-badge">Template Excel</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 7 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">7</div>
+                        <div class="session-info">
+                            <h3>Qualidade Informática</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Prática</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>6 Critérios de qualidade</li>
+                                <li>Avaliar websites</li>
+                                <li>Boas vs más práticas</li>
+                                <li>Criar checklists</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge ppt">PowerPoint</span>
+                        <span class="resource-badge">Checklist Avaliação</span>
+                        <span class="resource-badge">Atividade Websites</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 8 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">8</div>
+                        <div class="session-info">
+                            <h3>Gestão Económica</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Prática</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>Tipos de custos TI</li>
+                                <li>Criar orçamentos</li>
+                                <li>TCO - Custo Total</li>
+                                <li>Comprar vs Alugar</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge ppt">PowerPoint</span>
+                        <span class="resource-badge">Simulador Orçamento</span>
+                        <span class="resource-badge">Jogo "Onde Poupar?"</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 9 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">9</div>
+                        <div class="session-info">
+                            <h3>Revisão e Projeto (Parte 1)</h3>
+                            <div class="duration">⏱️ 3 horas</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Projeto</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>Quiz gigante revisão</li>
+                                <li>Apresentação projeto final</li>
+                                <li>Trabalho em grupo</li>
+                                <li>Iniciar desenvolvimento</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge">Quiz Gigante</span>
+                        <span class="resource-badge">Template Projeto</span>
+                        <span class="resource-badge">OneNote Workspace</span>
+                    </div>
+                </div>
+
+                <!-- Sessão 10 -->
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-number">10</div>
+                        <div class="session-info">
+                            <h3>Apresentações Finais</h3>
+                            <div class="duration">⏱️ 1 hora</div>
+                        </div>
+                    </div>
+                    <div class="session-details">
+                        <p><strong>Tipo:</strong> Avaliação</p>
+                        <div class="topics">
+                            <h4>📌 Tópicos:</h4>
+                            <ul>
+                                <li>Apresentações dos grupos</li>
+                                <li>Feedback e avaliação</li>
+                                <li>Autoavaliação</li>
+                                <li>Encerramento e certificados</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="resources">
+                        <span class="resource-badge">Grelha Avaliação</span>
+                        <span class="resource-badge">Forms Autoavaliação</span>
+                        <span class="resource-badge">Certificados</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: MATERIAIS -->
+        <div id="materiais" class="tab-content">
+            <div class="materials-list">
+                <div class="material-item">
+                    <div class="material-icon">📊</div>
+                    <div class="material-info">
+                        <h4>PowerPoints Interativos (7)</h4>
+                        <p>Sessões 1, 2, 3 prontos | Sessões 4-8 descritos no guia</p>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icon">❓</div>
+                    <div class="material-info">
+                        <h4>Quizzes Interativos (4)</h4>
+                        <p>A Tecnologia e Eu | Identificar Recursos | Revisão S1 | Verdadeiro/Falso</p>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icon">📄</div>
+                    <div class="material-info">
+                        <h4>Fichas Impressas (6)</h4>
+                        <p>Identificação | Sessão 1 | Sessão 2 | Sessão 3 | Projeto Final | Avaliação</p>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icon">📗</div>
+                    <div class="material-info">
+                        <h4>Guia Completo Sessões 4-10</h4>
+                        <p>Planeamentos detalhados, atividades, templates e materiais</p>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icon">📋</div>
+                    <div class="material-info">
+                        <h4>Templates Excel</h4>
+                        <p>Inventários | Orçamentos | Planos de manutenção | Projeto</p>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icon">🎮</div>
+                    <div class="material-info">
+                        <h4>Jogos e Atividades</h4>
+                        <p>Categorização | "Quem faz o quê?" | Cenários | "Onde poupar?"</p>
+                    </div>
+                </div>
+
+                <div class="material-item">
+                    <div class="material-icon">📚</div>
+                    <div class="material-info">
+                        <h4>Documentação Oficial</h4>
+                        <p>Catálogo Nacional de Qualificações | Apresentação TAG1</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: CALENDÁRIO -->
+        <div id="calendario" class="tab-content">
+            <div class="calendar-view">
+                <div class="calendar-header">
+                    <h3>📆 Planeamento de Sessões</h3>
+                    <div class="date-input-group">
+                        <input type="date" id="startDate" value="">
+                        <button onclick="generateCalendar()">Gerar Calendário</button>
+                    </div>
+                </div>
+                <div id="calendarGrid" class="calendar-grid">
+                    <p style="color: #666; text-align: center; padding: 40px;">
+                        Escolha a data de início e clique em "Gerar Calendário" para planear as suas sessões
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: FORMANDOS -->
+        <div id="formandos" class="tab-content">
+            <button class="add-formando-btn" onclick="addFormando()">➕ Adicionar Formando</button>
+            <div id="formandosList" class="formandos-container">
+                <p style="color: #666; text-align: center; padding: 40px; background: white; border-radius: 15px;">
+                    Clique em "Adicionar Formando" para começar a registar informações sobre os seus alunos
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB: CHECKLIST -->
+        <div id="checklist" class="tab-content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+            </div>
+
+            <div class="checklist">
+                <h3>✅ Preparação Geral</h3>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Rever todos os PowerPoints e materiais</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Testar todos os quizzes e formulários</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Preparar sala: computadores, projetor, impressora</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Configurar Teams e partilhar materiais</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Imprimir fichas de trabalho necessárias</label>
+                </div>
+            </div>
+
+            <div class="checklist" style="margin-top: 25px;">
+                <h3>✅ Por Sessão</h3>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 1: PowerPoint + Quiz 1 + Quiz 2 + Ficha</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 2: PowerPoint + Quiz V/F + Ficha + Atividade pesquisa</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 3: PowerPoint + Quiz Revisão + Ficha + Jogo</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 4: Preparar caso "Loja Sr. Manuel" + Templates Excel</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 5: Cartas "Quem faz o quê?" + Whiteboard organogramas</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 6: Cenários impressos + Template manutenção</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 7: Lista websites + Checklist avaliação</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 8: Simulador orçamento + Cenários "Onde poupar?"</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 9: Perguntas quiz gigante + Template projeto OneNote</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Sessão 10: Grelha avaliação + Forms + Certificados</label>
+                </div>
+            </div>
+
+            <div class="checklist" style="margin-top: 25px;">
+                <h3>✅ Durante o Curso</h3>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Manter ambiente positivo e encorajador</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Adaptar ritmo às necessidades do grupo</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Registar progressos e dificuldades dos formandos</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Dar feedback regular e construtivo</label>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <input type="checkbox">
+                    <label>Celebrar pequenas conquistas</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: DICAS -->
+        <div id="dicas" class="tab-content">
+            <div class="tips-box">
+                <h4>💡 Antes de Cada Sessão</h4>
+                <ul>
+                    <li>Rever o guião da sessão com atenção</li>
+                    <li>Testar toda a tecnologia (projetor, computadores, internet)</li>
+                    <li>Preparar exemplos extra caso seja necessário</li>
+                    <li>Ter sempre um plano B se a tecnologia falhar</li>
+                    <li>Verificar acesso dos formandos ao Teams e materiais</li>
+                    <li>Preparar-se emocionalmente para dar o melhor</li>
+                </ul>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Durante a Sessão</h4>
+                <ul>
+                    <li>Começar com energia positiva e acolhedora</li>
+                    <li>Verificar compreensão frequentemente ("Entenderam?", "Alguma dúvida?")</li>
+                    <li>Circular pela sala, observar e apoiar individualmente</li>
+                    <li>Dar atenção especial a quem está com mais dificuldades</li>
+                    <li>Gerir o tempo de forma flexível - não ter pressa</li>
+                    <li>Manter sempre um ambiente seguro e sem julgamentos</li>
+                    <li>Usar muitos exemplos do dia a dia</li>
+                    <li>Celebrar cada progresso, por mais pequeno que seja</li>
+                </ul>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Para Formandos com Dificuldades</h4>
+                <ul>
+                    <li><strong>Visual:</strong> Usar mais imagens, menos texto, esquemas coloridos, vídeos curtos</li>
+                    <li><strong>Linguagem:</strong> Evitar jargão técnico, explicar todos os termos, repetir conceitos importantes</li>
+                    <li><strong>Ritmo:</strong> Fazer pausas frequentes, dar mais tempo para atividades, rever quando necessário</li>
+                    <li><strong>Apoio:</strong> Trabalho em pares, ajuda individualizada, encorajamento constante</li>
+                    <li><strong>Avaliação:</strong> Focar no esforço não no resultado, celebrar pequenos progressos</li>
+                    <li><strong>Motivação:</strong> Relacionar sempre com situações reais, mostrar utilidade prática</li>
+                </ul>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Gestão de Grupo</h4>
+                <ul>
+                    <li><strong>Se o grupo está avançado:</strong> Dar tarefas extra/desafios, aprofundar tópicos, permitir pesquisa independente, pedir que apoiem colegas</li>
+                    <li><strong>Se o grupo tem dificuldades:</strong> Simplificar conteúdos, dar mais exemplos práticos, repetir conceitos, atividades mais guiadas</li>
+                    <li><strong>Para manter motivação:</strong> Variar atividades, gamificar quando possível, relacionar com vida real, celebrar conquistas</li>
+                    <li><strong>Dinâmica de grupo:</strong> Formar grupos mistos (mais/menos experientes juntos), rodar grupos, permitir escolha às vezes</li>
+                </ul>
+            </div>
+
+            <div class="tips-box">
+                <h4>💡 Após a Sessão</h4>
+                <ul>
+                    <li>Refletir sobre o que correu bem e o que pode melhorar</li>
+                    <li>Fazer notas sobre progressos individuais dos formandos</li>
+                    <li>Ajustar a próxima sessão se necessário</li>
+                    <li>Publicar materiais no Teams para revisão</li>
+                    <li>Responder a dúvidas que possam surgir</li>
+                    <li>Preparar com antecedência a próxima sessão</li>
+                    <li>Cuidar de si: descansar, hidratar, celebrar o trabalho feito</li>
+                </ul>
+            </div>
+
+            <div class="tips-box" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-left-color: #4caf50;">
+                <h4>🌟 Mensagem Importante</h4>
+                <ul>
+                    <li>Você é capaz! Tem experiência, conhecimento e dedicação</li>
+                    <li>Eles vão aprender! Com paciência e bom ambiente, todos progridem</li>
+                    <li>Pode adaptar! Use estes materiais como base, mas ajuste à sua turma</li>
+                    <li>Erros acontecem! Tecnologia falha, planos mudam. Está tudo bem!</li>
+                    <li>Celebre pequenas vitórias! Cada progresso conta muito</li>
+                    <li>O trabalho que está a fazer é importante e faz diferença na vida deles!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.tab').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active to clicked button
+            event.target.classList.add('active');
+        }
+
+        function toggleCheck(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            element.classList.toggle('checked', checkbox.checked);
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checklist-item input[type="checkbox"]');
+            const checked = document.querySelectorAll('.checklist-item input[type="checkbox"]:checked');
+            const percentage = Math.round((checked.length / checkboxes.length) * 100);
+            
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = percentage + '%';
+            progressFill.textContent = percentage + '%';
+        }
+
+        // Initialize
+        updateProgress();
+
+        // Calendar functionality
+        const sessions = [
+            { num: 1, title: "Recursos Informáticos", hours: 3 },
+            { num: 2, title: "Globalização", hours: 3 },
+            { num: 3, title: "Classificação Detalhada", hours: 3 },
+            { num: 4, title: "Planeamento de Recursos", hours: 3 },
+            { num: 5, title: "Centro Informático", hours: 3 },
+            { num: 6, title: "Manutenção de Sistemas", hours: 3 },
+            { num: 7, title: "Qualidade Informática", hours: 3 },
+            { num: 8, title: "Gestão Económica", hours: 3 },
+            { num: 9, title: "Revisão e Projeto", hours: 3 },
+            { num: 10, title: "Apresentações Finais", hours: 1 }
+        ];
+
+        function generateCalendar() {
+            const startDateInput = document.getElementById('startDate').value;
+            if (!startDateInput) {
+                alert('Por favor, selecione uma data de início!');
+                return;
+            }
+
+            const startDate = new Date(startDateInput + 'T00:00:00');
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            let currentDate = new Date(startDate);
+
+            sessions.forEach(session => {
+                // Skip weekends
+                while (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                const day = currentDate.getDate();
+                const month = currentDate.toLocaleDateString('pt-PT', { month: 'short' });
+                const fullDate = currentDate.toLocaleDateString('pt-PT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                const calendarItem = document.createElement('div');
+                calendarItem.className = 'calendar-item';
+                calendarItem.innerHTML = `
+                    <div class="calendar-date">
+                        <div class="day">${day}</div>
+                        <div class="month">${month}</div>
+                    </div>
+                    <div class="calendar-info">
+                        <h4>Sessão ${session.num}: ${session.title}</h4>
+                        <p>${fullDate} | ${session.hours}h</p>
+                    </div>
+                `;
+                calendarGrid.appendChild(calendarItem);
+
+                // Move to next day
+                currentDate.setDate(currentDate.getDate() + 1);
+            });
+        }
+
+        // Set today as default date
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+        });
+
+        // Formandos functionality
+        let formandoCount = 0;
+
+        function addFormando() {
+            formandoCount++;
+            const formandosList = document.getElementById('formandosList');
+            
+            // Remove placeholder if it exists
+            if (formandosList.children.length === 1 && formandosList.children[0].tagName === 'P') {
+                formandosList.innerHTML = '';
+            }
+
+            const formandoCard = document.createElement('div');
+            formandoCard.className = 'formando-card';
+            formandoCard.id = `formando-${formandoCount}`;
+            formandoCard.innerHTML = `
+                <div class="formando-header">
+                    <div class="formando-avatar">${formandoCount}</div>
+                    <input type="text" class="formando-input" placeholder="Nome do formando" 
+                           onchange="saveFormando(${formandoCount})">
+                    <button class="delete-btn" onclick="deleteFormando(${formandoCount})">🗑️</button>
+                </div>
+                <textarea class="formando-notes" placeholder="Notas sobre o formando (dificuldades, progressos, observações...)" 
+                          onchange="saveFormando(${formandoCount})"></textarea>
+                <div class="progress-indicator">
+                    ${sessions.map((s, i) => `
+                        <div class="progress-dot" title="Sessão ${s.num}" 
+                             onclick="toggleSessionProgress(${formandoCount}, ${i})">
+                            ${s.num}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            formandosList.appendChild(formandoCard);
+            
+            loadFormando(formandoCount);
+        }
+
+        function deleteFormando(id) {
+            if (confirm('Tem a certeza que deseja eliminar este formando?')) {
+                document.getElementById(`formando-${id}`).remove();
+                localStorage.removeItem(`formando-${id}`);
+                
+                // Show placeholder if no formandos left
+                const formandosList = document.getElementById('formandosList');
+                if (formandosList.children.length === 0) {
+                    formandosList.innerHTML = `
+                        <p style="color: #666; text-align: center; padding: 40px; background: white; border-radius: 15px;">
+                            Clique em "Adicionar Formando" para começar a registar informações sobre os seus alunos
+                        </p>
+                    `;
+                }
+            }
+        }
+
+        function toggleSessionProgress(formandoId, sessionIndex) {
+            const dot = event.target;
+            dot.classList.toggle('completed');
+            saveFormando(formandoId);
+        }
+
+        function saveFormando(id) {
+            const card = document.getElementById(`formando-${id}`);
+            const name = card.querySelector('.formando-input').value;
+            const notes = card.querySelector('.formando-notes').value;
+            const progress = Array.from(card.querySelectorAll('.progress-dot'))
+                .map(dot => dot.classList.contains('completed'));
+
+            const data = { name, notes, progress };
+            localStorage.setItem(`formando-${id}`, JSON.stringify(data));
+        }
+
+        function loadFormando(id) {
+            const saved = localStorage.getItem(`formando-${id}`);
+            if (saved) {
+                const data = JSON.parse(saved);
+                const card = document.getElementById(`formando-${id}`);
+                card.querySelector('.formando-input').value = data.name || '';
+                card.querySelector('.formando-notes').value = data.notes || '';
+                
+                if (data.progress) {
+                    const dots = card.querySelectorAll('.progress-dot');
+                    data.progress.forEach((completed, index) => {
+                        if (completed && dots[index]) {
+                            dots[index].classList.add('completed');
+                        }
+                    });
+                }
+            }
+        }
+
+        // Load all formandos on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check for saved formandos
+            for (let i = 1; i <= 50; i++) {
+                if (localStorage.getItem(`formando-${i}`)) {
+                    formandoCount = Math.max(formandoCount, i);
+                    addFormando();
+                    formandoCount = i; // Reset to correct count
+                }
+            }
+        });
+    </script>
+</body>
+</html>
